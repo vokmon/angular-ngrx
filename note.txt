@@ -1,0 +1,7 @@
+https://github.com/DeborahK/Angular-NgRx-GettingStarted
+
+Angular in-memory-web-api
+https://github.com/angular/in-memory-web-api
+
+ngrx-store
+npm install @ngrx/store
