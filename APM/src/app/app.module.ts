@@ -20,6 +20,8 @@ import { StoreModule } from '@ngrx/store';
 /* Feature Modules */
 import { UserModule } from './user/user.module';
 
+import { EffectsModule } from '@ngrx/effects';
+
 @NgModule({
   imports: [
     BrowserModule,
@@ -28,6 +30,7 @@ import { UserModule } from './user/user.module';
     UserModule,
     AppRoutingModule,
     StoreModule.forRoot({}),
+    EffectsModule.forRoot([]),
   ],
   declarations: [
     AppComponent,
