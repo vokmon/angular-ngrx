@@ -5,3 +5,7 @@ https://github.com/angular/in-memory-web-api
 
 ngrx-store
 npm install @ngrx/store
+
+redux-devtools
+https://chrome.google.com/webstore/detail/redux-devtools/lmhkpmbekcpmknklioeibfkpmmfibljd?hl=en
+npm install @ngrx/store-devtools --save

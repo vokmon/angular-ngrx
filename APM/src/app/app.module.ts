@@ -15,7 +15,7 @@ import { WelcomeComponent } from './home/welcome.component';
 import { PageNotFoundComponent } from './home/page-not-found.component';
 
 /* NgRx */
-import { StoreModule } from '@ngrx/store'
+import { StoreModule } from '@ngrx/store';
 
 /* Feature Modules */
 import { UserModule } from './user/user.module';
