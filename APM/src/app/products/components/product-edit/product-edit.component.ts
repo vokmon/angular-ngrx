@@ -1,26 +1,26 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, OnChanges,
+  SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
-import { Product } from '../product';
-import { ProductService } from '../product.service';
-import { GenericValidator } from '../../shared/generic-validator';
-import { NumberValidators } from '../../shared/number.validator';
+import { Product } from '../../product';
+import { ProductService } from '../../product.service';
+import { GenericValidator } from '../../../shared/generic-validator';
+import { NumberValidators } from '../../../shared/number.validator';
 
 /* NgRx */
-import { Store, select } from '@ngrx/store';
-import * as fromProduct from '../state/product.reducer';
-import * as productActions from '../state/product.action';
+// import { Store, select } from '@ngrx/store';
+// import * as fromProduct from '../../state';
+// import * as productActions from '../../state/product.action';
 
 @Component({
   selector: 'pm-product-edit',
   templateUrl: './product-edit.component.html',
   styleUrls: ['./product-edit.component.css']
 })
-export class ProductEditComponent implements OnInit, OnDestroy {
+export class ProductEditComponent implements OnInit, OnChanges {
   pageTitle = 'Product Edit';
-  errorMessage = '';
-  productForm: FormGroup;
 
+  productForm: FormGroup;
   product: Product | null;
 
   // Use with the generic validation message class
@@ -28,8 +28,15 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   private validationMessages: { [key: string]: { [key: string]: string } };
   private genericValidator: GenericValidator;
 
-  constructor(private store: Store<fromProduct.State>,
-              private fb: FormBuilder,
+  @Input() selectedProduct: Product;
+  @Input() errorMessage: string;
+
+  @Output() delete = new EventEmitter<Product>();
+  @Output() clearCurrent = new EventEmitter<void>();
+  @Output() addProduct = new EventEmitter<Product>();
+  @Output() updateProduct = new EventEmitter<Product>();
+
+  constructor(private fb: FormBuilder,
               private productService: ProductService) {
 
     // Defines all of the validation messages for the form.
@@ -64,9 +71,9 @@ export class ProductEditComponent implements OnInit, OnDestroy {
       description: ''
     });
 
-    this.store.pipe(select(fromProduct.getCurrentProduct)).subscribe(
-      currentProduct => this.displayProduct(currentProduct)
-    );
+    // this.store.pipe(select(fromProduct.getCurrentProduct)).subscribe(
+    //   currentProduct => this.displayProduct(currentProduct)
+    // );
 
     // Watch for value changes
     this.productForm.valueChanges.subscribe(
@@ -74,7 +81,12 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     );
   }
 
-  ngOnDestroy(): void {
+  ngOnChanges(changes: SimpleChanges): void {
+    // patch form with value from the store
+    if (changes.selectedProduct) {
+      const product: any = changes.selectedProduct.currentValue as Product;
+      this.displayProduct(product);
+    }
   }
 
   // Also validate on blur
@@ -117,14 +129,10 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   deleteProduct(): void {
     if (this.product && this.product.id) {
       if (confirm(`Really delete the product: ${this.product.productName}?`)) {
-        // this.productService.deleteProduct(this.product.id).subscribe(
-        //   () => this.store.dispatch(new productActions.ClearCurrentProduct()),
-        //   (err: any) => this.errorMessage = err.error
-        // );
-        this.store.dispatch(new productActions.DeleteProduct(this.product.id));
+        this.delete.emit(this.product);
       }
     } else {
-      this.store.dispatch(new productActions.ClearCurrentProduct());
+      this.clearCurrent.emit();
     }
   }
 
@@ -137,9 +145,9 @@ export class ProductEditComponent implements OnInit, OnDestroy {
         const p = { ...this.product, ...this.productForm.value };
 
         if (p.id === 0) {
-          this.store.dispatch(new productActions.AddProduct(p));
+          this.addProduct.emit(p);
         } else {
-          this.store.dispatch(new productActions.UpdateProduct(p));
+          this.updateProduct.emit(p);
         }
       }
     } else {
